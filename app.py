@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
-
-# Install required Python libraries:
-# pip3 install -U requests progress
+#
+# Takes as input a file of UniProt identifiers and returns protein function predictions from the DeepGo web API
+# Example usage: ./app.py <filename>
+# Example file data:
+#   SeqID Pdomain_length Pdomain_start Pdomain_end UniProtID
+#   19   309   326   634  Q9ULL5|PRR12_HUMAN Proline-rich protein 12 OS=Homo sapiens OX=9606
+#   73   115   437   551  Q8NDF8|PAPD5_HUMAN Terminal nucleotidyltransferase 4B OS=Homo sapi
+#
+# Dependencies:
+#   Install required Python libraries:
+#       pip3 install -U requests progress
 
 import sys
 import requests
