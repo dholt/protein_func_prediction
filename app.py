@@ -61,8 +61,12 @@ for ident in uniprot_ident:
     bar.next()
 bar.finish()
 
+pprint.pprint(fasta_data)
+
 # For each identifier/fasta combo, submit batches to the DeepGo API for prediction results
 #for ident, fasta in fasta_data.items():
+print("Fetching DeepGO predictions in batches of", deepgo_batch_size)
+bar = IncrementalBar('Progress', max = len(fasta_data)/deepgo_batch_size)
 for chunk in chunked(fasta_data.items(), deepgo_batch_size):
     # gather batches of fasta data to submit to the API
     for ident, fasta in chunk:
@@ -72,13 +76,21 @@ for chunk in chunked(fasta_data.items(), deepgo_batch_size):
     r = requests.post(deepgo_api_url, data=deepgo_json)
     #print(ident)
     # iterate through predictions for each protein
-    for protein in r.json()['predictions']:
-        #pprint.pprint(protein)
-        # parse out group of prediction results we're looking for
-        for group in protein['functions']:
-            if group['name'] == deepgo_group_name:
-                #pprint.pprint(group['functions'])
-                # add predictions to final data structure
-                results[protein['protein_info'].split('|')[1]] = group['functions']
+    try:
+        for protein in r.json()['predictions']:
+            #pprint.pprint(protein)
+            # parse out group of prediction results we're looking for
+            for group in protein['functions']:
+                if group['name'] == deepgo_group_name:
+                    #pprint.pprint(group['functions'])
+                    # add predictions to final data structure
+                    results[protein['protein_info'].split('|')[1]] = group['functions']
+    # Some of the fasta data seems to have invalid characters? Example API response:
+    #   { "detail": "JSON parse error - Invalid control character at: line 4 column 106 (char 159)" }
+    except KeyError as e:
+        print("Failure gathering predictions:", e)
 
+    bar.next()
+
+bar.finish()
 pprint.pprint(results)
