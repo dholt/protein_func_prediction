@@ -80,20 +80,23 @@ for chunk in chunked(fasta_data.items(), deepgo_batch_size):
     #print(ident)
     # iterate through predictions for each protein
     try:
-        for protein in r.json()['predictions']:
-            #pprint.pprint(protein)
-            # parse out group of prediction results we're looking for
-            for group in protein['functions']:
-                if group['name'] == deepgo_group_name:
-                    #pprint.pprint(group['functions'])
-                    # add predictions to final data structure
-                    results[protein['protein_info'].split('|')[1]] = group['functions']
+        if 'predictions' in r.json():
+            for protein in r.json()['predictions']:
+                #pprint.pprint(protein)
+                # parse out group of prediction results we're looking for
+                for group in protein['functions']:
+                    if group['name'] == deepgo_group_name:
+                        #pprint.pprint(group['functions'])
+                        # add predictions to final data structure
+                        results[protein['protein_info'].split('|')[1]] = group['functions']
+        else:
+            print("No predictions available", r.json())
     # Some of the fasta data seems to have invalid characters? Example API response:
     #   { "detail": "JSON parse error - Invalid control character at: line 4 column 106 (char 159)" }
-    except KeyError as e:
-        #print("Failure gathering predictions:", e)
+    except (KeyError, requests.exceptions.JSONDecodeError) as e:
         pass
 
+    deepgo_json['data'] = ""
     bar.next()
 
 bar.finish()
