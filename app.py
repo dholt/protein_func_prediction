@@ -28,6 +28,7 @@ deepgo_batch_size = 10
 uniprot_ident = []
 fasta_data = {}
 results = {}
+errors = []
 
 # Data structure sent to DeepGo API
 deepgo_json = {
@@ -80,21 +81,18 @@ for chunk in chunked(fasta_data.items(), deepgo_batch_size):
     #print(ident)
     # iterate through predictions for each protein
     try:
-        if 'predictions' in r.json():
-            for protein in r.json()['predictions']:
-                #pprint.pprint(protein)
-                # parse out group of prediction results we're looking for
-                for group in protein['functions']:
-                    if group['name'] == deepgo_group_name:
-                        #pprint.pprint(group['functions'])
-                        # add predictions to final data structure
-                        results[protein['protein_info'].split('|')[1]] = group['functions']
-        else:
-            print("No predictions available", r.json())
+        for protein in r.json()['predictions']:
+            #pprint.pprint(protein)
+            # parse out group of prediction results we're looking for
+            for group in protein['functions']:
+                if group['name'] == deepgo_group_name:
+                    #pprint.pprint(group['functions'])
+                    # add predictions to final data structure
+                    results[protein['protein_info'].split('|')[1]] = group['functions']
     # Some of the fasta data seems to have invalid characters? Example API response:
     #   { "detail": "JSON parse error - Invalid control character at: line 4 column 106 (char 159)" }
     except (KeyError, requests.exceptions.JSONDecodeError) as e:
-        pass
+        errors.append(e)
 
     deepgo_json['data'] = ""
     bar.next()
@@ -135,4 +133,5 @@ with open(sys.argv[1]+'_results.csv', 'w', encoding='UTF8', newline='') as f:
     # write multiple rows
     writer.writerows(data)
 
+pprint.pprint(errors)
 print("Finished, results file:", sys.argv[1]+'_results.csv')
