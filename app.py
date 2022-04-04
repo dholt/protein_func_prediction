@@ -91,7 +91,8 @@ for chunk in chunked(fasta_data.items(), deepgo_batch_size):
     # Some of the fasta data seems to have invalid characters? Example API response:
     #   { "detail": "JSON parse error - Invalid control character at: line 4 column 106 (char 159)" }
     except KeyError as e:
-        print("Failure gathering predictions:", e)
+        #print("Failure gathering predictions:", e)
+        pass
 
     bar.next()
 
