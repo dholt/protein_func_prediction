@@ -7,6 +7,8 @@
 #   19   309   326   634  Q9ULL5|PRR12_HUMAN Proline-rich protein 12 OS=Homo sapiens OX=9606
 #   73   115   437   551  Q8NDF8|PAPD5_HUMAN Terminal nucleotidyltransferase 4B OS=Homo sapi
 #
+# Results are output to a CSV file named: <input_filename>_results.csv
+#
 # Dependencies:
 #   Install required Python libraries:
 #       pip3 install -U requests progress
@@ -94,7 +96,7 @@ for chunk in chunked(fasta_data.items(), deepgo_batch_size):
     bar.next()
 
 bar.finish()
-pprint.pprint(results)
+#pprint.pprint(results)
 
 # Write data to CSV file
 # create header row
@@ -103,7 +105,6 @@ for prediction_group in results.values():
     for prediction in prediction_group:
         if prediction[1] not in header:
             header.append(prediction[1])
-print(header)
 
 # modify data to fit header
 data = []
@@ -121,7 +122,7 @@ for ident, prediction_group in results.items():
             row.append(0)
     data.append(row)
 
-with open('results.csv', 'w', encoding='UTF8', newline='') as f:
+with open(sys.argv[1]+'_results.csv', 'w', encoding='UTF8', newline='') as f:
     writer = csv.writer(f)
 
     # write the header
