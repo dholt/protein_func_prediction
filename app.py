@@ -130,3 +130,5 @@ with open(sys.argv[1]+'_results.csv', 'w', encoding='UTF8', newline='') as f:
 
     # write multiple rows
     writer.writerows(data)
+
+print("Finished, results file:", sys.argv[1]+'_results.csv')
