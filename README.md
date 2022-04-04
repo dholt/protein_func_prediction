@@ -1,7 +1,7 @@
 # Protein function predictor using DeepGOWeb
 
 This is a helper application for converting a list of UniProt identifiers to a CSV file
-of protein function predictions using the (DeepGOWeb)[https://deepgo.cbrc.kaust.edu.sa/deepgo/] API
+of protein function predictions using the [DeepGOWeb](https://deepgo.cbrc.kaust.edu.sa/deepgo/) API
 
 Takes as input a file of UniProt identifiers and returns protein function predictions from the DeepGo web API
 
