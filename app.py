@@ -17,6 +17,7 @@ import json
 import pprint
 import itertools
 from progress.bar import IncrementalBar
+import csv
 
 uniprot_base_url = "https://www.uniprot.org/uniprot"   # /uniprot_id.fasta
 deepgo_api_url = "https://deepgo.cbrc.kaust.edu.sa/deepgo/api/create"
@@ -61,7 +62,7 @@ for ident in uniprot_ident:
     bar.next()
 bar.finish()
 
-pprint.pprint(fasta_data)
+#pprint.pprint(fasta_data)
 
 # For each identifier/fasta combo, submit batches to the DeepGo API for prediction results
 #for ident, fasta in fasta_data.items():
@@ -94,3 +95,37 @@ for chunk in chunked(fasta_data.items(), deepgo_batch_size):
 
 bar.finish()
 pprint.pprint(results)
+
+# Write data to CSV file
+# create header row
+header = ['ident']
+for prediction_group in results.values():
+    for prediction in prediction_group:
+        if prediction[1] not in header:
+            header.append(prediction[1])
+print(header)
+
+# modify data to fit header
+data = []
+for ident, prediction_group in results.items():
+    row = []
+    row.append(ident)
+    for column in header[1:]:
+        found = False
+        for prediction in prediction_group:
+            if prediction[1] == column:
+                row.append(prediction[2])
+                found = True
+                continue
+        if not found:
+            row.append(0)
+    data.append(row)
+
+with open('results.csv', 'w', encoding='UTF8', newline='') as f:
+    writer = csv.writer(f)
+
+    # write the header
+    writer.writerow(header)
+
+    # write multiple rows
+    writer.writerows(data)
